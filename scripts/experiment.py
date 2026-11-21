@@ -19,6 +19,7 @@ from bench.metrics import compare, load_results
 from bench.trace import generate, load_trace, write_trace
 from calibration.__main__ import atomic_write, main as calibration_cli, traces
 from calibration.table import evaluate
+from scripts.model_identity import model_identity
 from engine.install import RELATIVE, inspect_source, render
 
 
@@ -89,7 +90,7 @@ def implementation_hashes(model):
     files = ["scripts/experiment.py", "scripts/trial.py", "bench/__main__.py", "bench/metrics.py",
              "bench/replay.py", "bench/trace.py", "calibration/__main__.py", "calibration/table.py"]
     return dict(scheduler_sha256=hashlib.sha256(active).hexdigest(),
-                model_config_sha256=digest(model / "config.json"),
+                model_config_sha256=digest(model / "config.json"), model_snapshot=model_identity(model),
                 sources_sha256={name:digest(ROOT / name) for name in files})
 
 

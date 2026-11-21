@@ -38,6 +38,8 @@ MIXED_SLO_UPSTREAM_FIXTURE=/tmp/vllm-v0102-scheduler.py python -m unittest disco
 
 ## GPU 快速实验
 
+共享服务器上已有固定版本时，可从只读环境建立项目私有副本，使用该副本的 Python 执行实验。脚本会核对补丁前后的公共文件哈希和私有解释器的实际导入位置。[共享环境使用手册](docs/SHARED_ENV.md)
+
 准备 Linux、兼容的 NVIDIA 驱动、单张空闲 GPU 和固定版本的本地 Hugging Face 生成模型。模型须支持至少 3072 的上下文窗口，并检查输入 token ID 1024–4095 在其词表内。以下示例在仓库根目录和专用虚拟环境执行，`MODEL` 指向已有模型快照，`GPU` 为物理编号。安装器会修改这个环境中经 SHA-256 校验的 vLLM 调度器文件，正在使用它的服务应先停止。
 
 ```bash
@@ -54,6 +56,8 @@ Quick 依次启动 8 次服务。先做 2 个校准运行、1 个独立留出运
 去掉 `--quick` 并更换 `--out` 可运行完整矩阵，包含纯短、纯长、两档混合速率和突发负载，每个测试场景使用 3 个独立种子。中断后可用相同参数加 `--resume` 复用已完成的轮次。实验结束并停止服务后，执行 `python -m engine.install revert` 可恢复原始调度器。[矩阵参数、对照设计与恢复方法](docs/EXPERIMENT.md)
 
 ## 如何核查性能结论
+
+项目记录了实际部署中遇到的包名冲突、公共环境版本检查与 GPU 占用变化。模型快照的权重、配置和分词文件 SHA-256 存入 `plan.json → implementation → model_snapshot`。实验完成或中断后均可导出可复算的证据包。[验证与失败复盘](docs/RESULTS.md) · [结果导出指南](docs/PUBLISH_EVIDENCE.md)
 
 | 想回答的问题 | 打开的文件及应查看的字段 |
 | --- | --- |
