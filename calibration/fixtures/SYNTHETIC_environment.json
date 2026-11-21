@@ -1,0 +1,6 @@
+{
+  "evidence_kind": "synthetic_fixture",
+  "model": "none",
+  "gpu": "none",
+  "description": "Invented example input for offline tests only. Do not load into real serving or cite as measured performance."
+}

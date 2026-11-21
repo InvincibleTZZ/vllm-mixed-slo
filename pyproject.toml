@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vllm-mixed-slo"
+version = "0.1.0"
+description = "Measured prefill budgets and open-loop mixed-workload evaluation for vLLM V1"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "InvincibleTZZ"}]
+dependencies = []
+
+[project.optional-dependencies]
+gpu = [
+    "vllm==0.10.2; platform_system == 'Linux'",
+    "transformers==4.55.4; platform_system == 'Linux'",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["engine*", "bench*", "calibration*"]

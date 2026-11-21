@@ -1,0 +1,37 @@
+name: CPU tests and upstream scheduler compatibility
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12"]
+    name: Python ${{ matrix.python }} / vLLM 0.10.2
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Fetch exact upstream scheduler for source integration tests
+        shell: bash
+        run: |
+          file="$RUNNER_TEMP/vllm-0.10.2-scheduler.py"
+          curl --fail --silent --show-error --location --retry 3 \
+            https://raw.githubusercontent.com/vllm-project/vllm/v0.10.2/vllm/v1/core/sched/scheduler.py \
+            --output "$file"
+          echo "2bd28fc32cea71370298bb8da0d9a0bbd163ab315b2c6428540131e3999a255f  $file" | sha256sum --check
+      - name: Install the CPU-only project
+        run: python -m pip install .
+      - name: Test policy, calibration, HTTP replay and the upstream scheduling loop
+        env:
+          MIXED_SLO_UPSTREAM_FIXTURE: ${{ runner.temp }}/vllm-0.10.2-scheduler.py
+        run: python -m unittest discover -s tests -v

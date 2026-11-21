@@ -1,0 +1,7 @@
+{"clock":"scheduler_result_wall","run_id":"SYNTHETIC-F","decode_count":2,"context_tokens":512,"prefill_tokens":32,"step_ms":5,"fixture":"deterministic example numbers, not GPU measurements"}
+{"clock":"scheduler_result_wall","run_id":"SYNTHETIC-F","decode_count":2,"context_tokens":512,"prefill_tokens":32,"step_ms":7,"fixture":"deterministic example numbers, not GPU measurements"}
+{"clock":"scheduler_result_wall","run_id":"SYNTHETIC-F","decode_count":2,"context_tokens":512,"prefill_tokens":64,"step_ms":9,"fixture":"deterministic example numbers, not GPU measurements"}
+{"clock":"scheduler_result_wall","run_id":"SYNTHETIC-F","decode_count":2,"context_tokens":512,"prefill_tokens":64,"step_ms":11,"fixture":"deterministic example numbers, not GPU measurements"}
+{"clock":"scheduler_result_wall","run_id":"SYNTHETIC-F","decode_count":2,"context_tokens":512,"prefill_tokens":128,"step_ms":3,"fixture":"deterministic example numbers, not GPU measurements"}
+{"clock":"scheduler_result_wall","run_id":"SYNTHETIC-F","decode_count":2,"context_tokens":512,"prefill_tokens":128,"step_ms":4,"fixture":"deterministic example numbers, not GPU measurements"}
+{"clock":"scheduler_result_wall","run_id":"SYNTHETIC-F","decode_count":2,"context_tokens":512,"prefill_tokens":256,"step_ms":8,"fixture":"deterministic example numbers, not GPU measurements"}
