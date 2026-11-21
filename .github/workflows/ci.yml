@@ -35,3 +35,7 @@ jobs:
         env:
           MIXED_SLO_UPSTREAM_FIXTURE: ${{ runner.temp }}/vllm-0.10.2-scheduler.py
         run: python -m unittest discover -s tests -v
+      - name: Recompute measurements from published GPU evidence
+        run: |
+          python scripts/publish_evidence.py verify --bundle evidence/a800-qwen15b-quick
+          python scripts/publish_evidence.py verify --bundle evidence/a800-r550-partial

@@ -32,7 +32,7 @@ def read(path):
 
 
 def dump(path, obj):
-    path.write_text(json.dumps(obj, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    path.write_bytes((json.dumps(obj, indent=2, allow_nan=False) + "\n").encode("utf-8"))
 
 
 def json_line(obj):

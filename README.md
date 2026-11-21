@@ -4,7 +4,7 @@
 
 长 prompt 分块越大，完成 prefill 所需的迭代通常越少，但它可能拉长同批 decode 用户下一次看到输出的等待时间。把分块一律调小也有代价，长请求可能更晚看到首 token。本项目分别跟踪短、长两类请求的首 token 延迟（TTFT）、后续 token 平均时延（TPOT）、可观察的相邻 token 间隔（ITL），以及同时达到 TTFT 和 TPOT 目标的每秒请求数（SLO goodput）。
 
-**当前验证记录。** 2026-11-21 在本地 CPU 上载入经 SHA-256 校验的 vLLM 0.10.2 上游调度源码，27 项回归测试全部通过。其中一项在上游循环中重放运行中与等待中的请求，验证两个入口共享 6 个 prefill token，另一个 ready decode 获得 1 个 token。校准样例的耗时为人工构造值。GPU 吞吐和尾延迟应从对应模型的配对运行结果中读取。[上游循环断言](tests/test_engine_install.py) · [实验矩阵](docs/EXPERIMENT.md)
+**单卡 A800 实测。** 2026-11-21 使用 Qwen2.5-1.5B-Instruct 完成 8 个轮次，128 次正式请求全部成功。在同一突发测试集上，自适应组与原生组的 16 条输出逐 token 一致。短请求 p95 TPOT 从 11.36 降至 10.47 ms，但 p95 TTFT 从 110.24 升至 150.47 ms，SLO goodput 从 28.65 降至 27.17 请求/秒。独立留出集中可查表的混合步只有 1/5。其他三个对照组出现了输出差异；报告保留了失败的全组一致性检查、全部配置和原始计时。[五组结果与差异样本](docs/A800_RESULTS.md) · [可离线复算的证据包](evidence/a800-qwen15b-quick/index.json) · [失败复盘](docs/RESULTS.md)
 
 ## 从一次调度到用户指标
 

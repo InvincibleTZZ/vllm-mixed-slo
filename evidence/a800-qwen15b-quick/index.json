@@ -1,0 +1,328 @@
+{
+  "schema": 1,
+  "plan": {
+    "schema": 1,
+    "quick": true,
+    "rate_scale": 1.0,
+    "workload_shape": {
+      "n": 16,
+      "short_input": 64,
+      "long_input": 512,
+      "short_output": 8,
+      "long_output": 16
+    },
+    "min_samples": 2,
+    "workloads": {
+      "fit-burst-1100": {
+        "mix": "burst",
+        "seed": 1100,
+        "rate": 24.0
+      },
+      "fit-mixed-1110": {
+        "mix": "mixed",
+        "seed": 1110,
+        "rate": 24.0
+      },
+      "holdout-burst-2300": {
+        "mix": "burst",
+        "seed": 2300,
+        "rate": 24.0
+      },
+      "eval-burst-3500": {
+        "mix": "burst",
+        "seed": 3500,
+        "rate": 24.0
+      }
+    },
+    "trials": [
+      {
+        "name": "fit-burst-1100-observe",
+        "stage": "fit",
+        "trace": "fit-burst-1100",
+        "arm": "observe",
+        "mode": "observe",
+        "budget": 128
+      },
+      {
+        "name": "fit-mixed-1110-observe",
+        "stage": "fit",
+        "trace": "fit-mixed-1110",
+        "arm": "observe",
+        "mode": "observe",
+        "budget": 512
+      },
+      {
+        "name": "holdout-burst-2300-observe",
+        "stage": "holdout",
+        "trace": "holdout-burst-2300",
+        "arm": "observe",
+        "mode": "observe",
+        "budget": 512
+      },
+      {
+        "name": "eval-burst-3500-off",
+        "stage": "eval",
+        "trace": "eval-burst-3500",
+        "arm": "off",
+        "mode": "off",
+        "budget": 512
+      },
+      {
+        "name": "eval-burst-3500-observe",
+        "stage": "eval",
+        "trace": "eval-burst-3500",
+        "arm": "observe",
+        "mode": "observe",
+        "budget": 512
+      },
+      {
+        "name": "eval-burst-3500-adaptive",
+        "stage": "eval",
+        "trace": "eval-burst-3500",
+        "arm": "adaptive",
+        "mode": "adaptive",
+        "budget": 512
+      },
+      {
+        "name": "eval-burst-3500-static-small",
+        "stage": "eval",
+        "trace": "eval-burst-3500",
+        "arm": "static-small",
+        "mode": "off",
+        "budget": 128
+      },
+      {
+        "name": "eval-burst-3500-static-mid",
+        "stage": "eval",
+        "trace": "eval-burst-3500",
+        "arm": "static-mid",
+        "mode": "off",
+        "budget": 256
+      }
+    ],
+    "settings": {
+      "target_ms": 15.0,
+      "short_ttft_ms": 250.0,
+      "long_ttft_ms": 700.0,
+      "tpot_ms": 40.0,
+      "min_mixed_coverage": 0.0
+    }
+  },
+  "workload_sha256": {
+    "fit-burst-1100": "c423a4f28e24bae9e94c81b2ee5db5c537d42cbf2b577d2c6a10833050ac8102",
+    "fit-mixed-1110": "dd0b50557513636c92d1ff7d345e7a6ffd1617b3f6b25f1a179496f133633875",
+    "holdout-burst-2300": "739ed200310d58efa2d7bb1f28e93c4d5e8da817324ecf5188c0760a1fc45a89",
+    "eval-burst-3500": "c95b9a054b90d0e096520dd7100d5e4c81e1f527b60a6b6d0523bf0f8aaf21d5"
+  },
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "attempts": {
+    "fit-burst-1100-observe": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 128,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ],
+    "fit-mixed-1110-observe": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 512,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ],
+    "holdout-burst-2300-observe": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 512,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ],
+    "eval-burst-3500-off": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 512,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ],
+    "eval-burst-3500-observe": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 512,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ],
+    "eval-burst-3500-adaptive": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "policy_profile_sha256": "789f19d2a28dc51a449ab7adad3fa59a11cc5f3e22d90d75f621726bc93a1553",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 512,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ],
+    "eval-burst-3500-static-small": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 128,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ],
+    "eval-burst-3500-static-mid": [
+      {
+        "attempt": 1,
+        "status": "completed",
+        "environment": {
+          "gpu_family": "A800",
+          "memory_mib": 81920,
+          "driver": "570.172.08",
+          "vllm": "0.10.2",
+          "torch": "2.8.0",
+          "python": "3.12.13",
+          "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+          "tensor-parallel-size": 1,
+          "max-model-len": 3072,
+          "max-num-seqs": 32,
+          "max-num-batched-tokens": 256,
+          "dtype": "auto",
+          "gpu_memory_utilization": 0.78,
+          "enforce-eager": true,
+          "enable-chunked-prefill": true,
+          "no-enable-prefix-caching": true
+        }
+      }
+    ]
+  },
+  "implementation": {
+    "scheduler_sha256": "081e4b96f4f6966e36530a1e7edf8ae8a6413ba63335c76a816c3b1a24af56de",
+    "model_config_sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+    "model_snapshot_sha256": "34d4ef9e045b65419a767db175aa71908385ea145e1890c66c6da666107f68fc",
+    "sources_sha256": {
+      "scripts/experiment.py": "444fa74e58e5649fd96f86b6243f4857e857205f1c595e75b2fdfeb07cd6875c",
+      "scripts/trial.py": "36b18145f88a6b91ee8e8dd86aa04e48793824e50a7242ac74c3f39fc49073b0",
+      "bench/__main__.py": "e04f2d3f8ff1a7d80597edf29950bd933d74a1cee8a327620ac2d16adbeacb1b",
+      "bench/metrics.py": "c9dfca74c10c6789ad2599418bbe241f67a306ea737aae3657436658db780f43",
+      "bench/replay.py": "0c61d76055aaab2aad37cc23f541f0360c05181e09fa9d8cb8170cb4fb7c8bc7",
+      "bench/trace.py": "c398ca50ccca3e558edc5b51b19e25540821b0fc82a4ced64df524b63d82a90a",
+      "calibration/__main__.py": "eb08e6d56808c8be9763608db642a3fad3754dd2720d78fdf11ed433e9d80e79",
+      "calibration/table.py": "5eb09b65895791eafd4a80209ce5fd3a2d303ae62dfb2b71ca4ece638ab5a5f5"
+    }
+  }
+}
