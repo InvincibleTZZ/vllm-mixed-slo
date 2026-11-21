@@ -39,12 +39,19 @@ def json_line(obj):
     return (json.dumps(obj, separators=(",", ":"), allow_nan=False) + "\n").encode()
 
 
-def stream(path):
+def stream(path, partial_attempt=None):
     opener = gzip.open if path.suffix == ".gz" else open
     with opener(path, "rb") as src:
         for line in src:
             if line.strip():
-                yield json.loads(line)
+                try:
+                    value = json.loads(line)
+                except (ValueError, UnicodeError):
+                    if partial_attempt is not None and not line.endswith(b"\n"):
+                        partial_attempt["torn_final_record"] = True
+                        return
+                    raise
+                yield value
 
 
 def compress(path, rows):
@@ -313,7 +320,7 @@ def export(matrix, destination, model="local-model"):
                 if (folder / "requests.jsonl").exists():
                     compress(out / "requests.jsonl.gz",
                              (request_row(r, name, hashes[key], signatures[key], model)
-                              for r in stream(folder / "requests.jsonl")))
+                              for r in stream(folder / "requests.jsonl", item if status != "completed" else None)))
                 if (folder / "measured-steps.jsonl").exists():
                     compress(out / "steps.jsonl.gz",
                              (step_row(r, name) for r in stream(folder / "measured-steps.jsonl")))

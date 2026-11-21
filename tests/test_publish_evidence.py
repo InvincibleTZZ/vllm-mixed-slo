@@ -6,9 +6,64 @@ import unittest
 from scripts.experiment import make_plan, trace_inputs
 from scripts.publish_evidence import dump, export, read, stream, verify
 from bench.trace import load_trace
+from calibration.table import Step, fit
 
 
 class PublicEvidenceTest(unittest.TestCase):
+    def test_rebuild_private_profile_and_holdout_from_public_steps(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            matrix = root / "matrix"
+            matrix.mkdir()
+            plan = make_plan(True)
+            plan["settings"] = dict(target_ms=10, short_ttft_ms=500, long_ttft_ms=1000,
+                                    tpot_ms=100, min_mixed_coverage=0)
+            plan["implementation"] = dict(model_snapshot={"sha256": "a"*64, "files": {"hidden-path": "b"*64}})
+            dump(matrix/"plan.json", plan)
+            paths = trace_inputs(matrix, plan)
+            training = []
+            for trial in plan["trials"]:
+                if trial["stage"] == "eval":
+                    continue
+                name = trial["name"]
+                folder = matrix / "trials" / "attempt-1" / name
+                folder.mkdir(parents=True)
+                rows, sig = load_trace(paths[trial["trace"]])
+                dump(folder/"manifest.json", dict(status="completed", run_id=name, mode="observe", trace_sha256=sig))
+                with (folder/"requests.jsonl").open("w") as f:
+                    for r in rows:
+                        count = r["output_tokens"]
+                        end = r["arrival_s"] + .01
+                        payload = dict(schema=1, id=r["id"], kind=r["kind"], status="ok", backend="mock",
+                                       scheduled_s=r["arrival_s"], sent_s=r["arrival_s"], end_s=end+.02*count,
+                                       trace_sha256=sig, expected_requests=len(rows), events=[[end+j*.02,1]
+                                       for j in range(count)], max_inflight=32, timeout_s=2,
+                                       output_ids=list(range(count)), input_tokens=len(r["prompt"]), target_tokens=count)
+                        f.write(json.dumps(payload)+"\n")
+                with (folder/"measured-steps.jsonl").open("w") as f:
+                    for ms in (4, 12):
+                        step = dict(clock="scheduler_result_wall", run_id=name, decode_count=1,
+                                    context_tokens=128, prefill_tokens=32, step_ms=ms, schedule_ms=.2,
+                                    reason="native", cap_tokens=None, excluded_cumulative={"hidden-path": 1})
+                        f.write(json.dumps(step)+"\n")
+                        if trial["stage"] == "fit":
+                            training.append(Step.from_dict(step))
+            profile = fit(training, min_samples=2, metadata={"path": "hidden-path"})
+            dump(matrix/"profile.json", profile)
+            report = export(matrix, root/"evidence")
+            self.assertEqual(verify(root/"evidence"),report)
+            self.assertEqual(report["profile"]["cells"],profile["cells"])
+            self.assertEqual(report["holdout"]["coverage"],1.)
+            self.assertEqual(report["holdout"]["covered_rows"],2)
+            index = read(root/"evidence"/"index.json")
+            self.assertEqual(index["implementation"]["model_snapshot_sha256"],"a"*64)
+            self.assertNotIn("hidden-path",json.dumps(report))
+            profile["cells"][0]["p95_ms"] += 3
+            dump(matrix/"profile.json", profile)
+            with self.assertRaisesRegex(ValueError, "refit differs"):
+                export(matrix,root/"mismatch")
+            self.assertFalse((root/"mismatch").exists())
+
     def test_private_data_exclusion_and_independent_recomputation(self):
         secret = "private-user-XY"
         with tempfile.TemporaryDirectory() as tmp:
@@ -46,6 +101,7 @@ class PublicEvidenceTest(unittest.TestCase):
                 failed = matrix/"trials"/"attempt-2"/run["name"]
                 failed.mkdir(parents=True)
                 dump(failed/"manifest.json",dict(manifest,status="failed",error="server exited on "+secret))
+                (failed/"requests.jsonl").write_bytes(b'{"id":')
             report = export(matrix,out)
             self.assertEqual(report,verify(out))
             self.assertEqual(report["completed_trials"],2)
@@ -55,6 +111,7 @@ class PublicEvidenceTest(unittest.TestCase):
             self.assertEqual((metrics["offered"],metrics["successful"],metrics["slo_pass"]),(16,15,15))
             self.assertEqual(report["paired_vs_off"][hit]["not_paired_success"],1)
             self.assertEqual(read(out/"index.json")["attempts"][hit][1]["failure"],"server_exited")
+            self.assertTrue(read(out/"index.json")["attempts"][hit][1]["torn_final_record"])
             for path in out.rglob("*"):
                 if path.is_file():
                     payload = json.dumps(list(stream(path))) if path.suffix==".gz" else path.read_text()

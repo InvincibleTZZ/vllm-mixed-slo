@@ -24,11 +24,17 @@ def check_gpu(gpu):
     inherited = os.environ.get("CUDA_VISIBLE_DEVICES")
     if inherited is not None and str(gpu) not in inherited.split(","):
         raise RuntimeError(f"physical GPU {gpu} is outside CUDA_VISIBLE_DEVICES={inherited!r}")
-    info = smi(gpu, "--query-gpu=name,uuid,driver_version,memory.total,memory.used,utilization.gpu")
-    name, uuid, driver, total, used, util = [x.strip() for x in info.split(",")]
-    if smi(gpu, "--query-compute-apps=pid") or int(used) > 1024 or int(util) > 10:
-        raise RuntimeError(f"GPU {gpu} already in use: {used} MiB, {util}%")
-    return dict(name=name, uuid=uuid, driver=driver, memory_mib=int(total))
+    for sample in range(5):
+        info = smi(gpu, "--query-gpu=name,uuid,driver_version,memory.total,memory.used,utilization.gpu")
+        name, uuid, driver, total, used, util = [x.strip() for x in info.split(",")]
+        if smi(gpu, "--query-compute-apps=pid") or int(used) > 1024:
+            break
+        if int(util) <= 10:
+            return dict(name=name, uuid=uuid, driver=driver, memory_mib=int(total))
+        # Utilization covers a sampling window that can outlive the last CUDA context.
+        if sample < 4:
+            time.sleep(1)
+    raise RuntimeError(f"GPU {gpu} already in use: {used} MiB, {util}%")
 
 def port_number():
     with socket.socket() as sock:
